@@ -729,13 +729,14 @@ static void MiSTer_UpdateJoystick(void)
 
     ev.type = ev_joystick;
     ev.data1 = buttons & ~mister_joy_taken;
-    // turn: the right stick, or the d-pad all the way
-    ev.data2 = (hat & SDL_HAT_LEFT) && !mister_dpad_actions ? -FRACUNIT :
-               (hat & SDL_HAT_RIGHT) && !mister_dpad_actions ? FRACUNIT : MiSTer_Axis(2);
-    // forward and back: the left stick, or the d-pad
-    ev.data3 = (hat & SDL_HAT_UP) && !mister_dpad_actions ? -FRACUNIT :
-               (hat & SDL_HAT_DOWN) && !mister_dpad_actions ? FRACUNIT : MiSTer_Axis(1);
-    ev.data4 = MiSTer_Axis(0);
+    // turn: the right stick (the d-pad strafes instead of turning, Jess, 2026-11-19)
+    ev.data2 = MiSTer_Axis(2);
+    // forward and back: the left stick, or the d-pad (unless the d-pad is the inventory: Strife)
+    ev.data3 = (hat & SDL_HAT_UP) && !(mister_dpad_actions & MISTER_DPAD_INVENTORY) ? -FRACUNIT :
+               (hat & SDL_HAT_DOWN) && !(mister_dpad_actions & MISTER_DPAD_INVENTORY) ? FRACUNIT : MiSTer_Axis(1);
+    // strafe: the left stick, or the d-pad
+    ev.data4 = (hat & SDL_HAT_LEFT) && !(mister_dpad_actions & MISTER_DPAD_INVENTORY) ? -FRACUNIT :
+               (hat & SDL_HAT_RIGHT) && !(mister_dpad_actions & MISTER_DPAD_INVENTORY) ? FRACUNIT : MiSTer_Axis(0);
     ev.data5 = MiSTer_Axis(3);
     ev.data6 = ((((hat & SDL_HAT_UP) ? JOY_DIR_UP : 0) |
                  ((hat & SDL_HAT_DOWN) ? JOY_DIR_DOWN : 0) |
